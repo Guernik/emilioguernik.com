@@ -17,7 +17,7 @@ export default defineConfig({
   },
   integrations: [
     expressiveCode({
-      themes: ["github-dark"],
+      themes: ["monokai"],
     }),
     mdx(),
     icon(),
