@@ -9,6 +9,21 @@
 /* Disable TailwindCSS default color palette ----------------------------------------- */
 @theme {
   --color-*: initial;
+
+  /* Animation */
+  --animate-slide-in: slide-in 0.5s ease-out both;
+
+  /* Keyframes */
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 100;
+      transform: none;
+    }
+  }
 }
 
 /* Flexoki Palette Tokens ------------------------------------------------------------ */
