@@ -14,6 +14,9 @@ import expressiveCode from "astro-expressive-code"
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs"
 import rehypeLightbox from "./src/plugins/rehype-lightbox.mjs"
 
+// Sidey Config
+import { sideyConfig } from "./sidey.config.ts"
+
 // https://astro.build/config
 export default defineConfig({
   devToolbar: {
@@ -35,6 +38,7 @@ export default defineConfig({
     defaultStrategy: "viewport",
     prefetchAll: true,
   },
+  site: sideyConfig.site.url,
   vite: {
     plugins: [tailwindcss()],
   },
