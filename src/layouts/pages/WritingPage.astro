@@ -12,13 +12,13 @@ const formattedDate = formatDate(date, "long")
 ---
 
 <BaseLayout title={title} description={description}>
-  <Prose>
+  <Prose class="has-dropcap">
     <h1>{title}</h1>
 
-    <div class="-mt-4 mb-8 space-x-2 text-sm text-muted-foreground">
-      <time datetime={date}>{formattedDate}</time>
-      <span>&middot;</span>
-      <span>{readingTime}</span>
+    <div class="not-prose -mt-4 mb-8 flex items-center gap-x-3">
+      <time datetime={date} class="almanac-smallcaps">{formattedDate}</time>
+      <hr class="rule-hair grow" />
+      <span class="almanac-smallcaps">{readingTime}</span>
     </div>
 
     <slot />

@@ -9,16 +9,16 @@ export const sideyConfig = {
    */
   site: {
     // The main title displayed in browser tabs and search engine results
-    title: "Astro Sidey",
+    title: "Emilio Guernik",
 
     // A short fallback summary of your site used for SEO and social share cards
-    description: "A minimal, content-focused Astro theme for personal sites.",
+    description: "The personal site and blog of Emilio Guernik.",
 
     // The production domain where your site is deployed (no trailing slash)
-    url: "https://sidey.odhyp.com",
+    url: "https://emilioguernik.com",
 
     // Your name, utilized in copyright strings and author meta tags
-    author: "Odhy Pradhana",
+    author: "Emilio Guernik",
 
     // The primary language attribute for HTML accessibility engines (e.g., "en", "id")
     locale: "en",

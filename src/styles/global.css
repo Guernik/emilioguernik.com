@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@fontsource-variable/fraunces/opsz.css";
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
 
@@ -246,7 +247,9 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-heading: var(--font-sans);
+  /* Almanac: Fraunces display serif for headings; Geist stays for body + UI */
+  --font-display: "Fraunces Variable", ui-serif, Georgia, "Times New Roman", serif;
+  --font-heading: var(--font-display);
   --font-sans: "Geist Variable", sans-serif;
   --font-mono: "Geist Mono Variable", monospace;
 
@@ -302,5 +305,83 @@
 
   .heading-anchor:hover::before {
     @apply text-muted-foreground/75;
+  }
+}
+
+/* Hallmark · genre: editorial · macrostructure: Long Document · theme: Almanac
+ * tone: editorial · anchor hue: warm (Flexoki red-600, oklch 0.50 0.16 27.8)
+ * display: Fraunces Variable (roman, optical) · body/ui: Geist Variable
+ * nav: N9 edge-aligned side-rail · footer: Ft4 dense colophon
+ * paper band: light (#FFFCF0) · display style: roman-serif · accent hue: warm
+ * redesign: in-place type + accent + rhythm layer over existing Flexoki tokens
+ */
+@layer base {
+  /* Display serif carries its own optical contrast; enable the opsz axis
+     and let large sizes read high-contrast, small sizes stay sturdy. */
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.011em;
+  }
+
+  /* Almanac headings are roman and lightly-set — weight, not heft.
+     Fraunces at 460–560 reads editorial without shouting. */
+  h1.font-display,
+  .prose h1 {
+    font-weight: 540;
+    font-variation-settings: "opsz" 96;
+    line-height: 1.06;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
+  .prose h2,
+  .prose h3 {
+    font-weight: 500;
+    font-variation-settings: "opsz" 40;
+  }
+}
+
+/* Almanac utilities — additive, referenced by name from components. */
+@layer components {
+  /* Hairline broadsheet rule — replaces card borders in the almanac voice. */
+  .rule-hair {
+    border: 0;
+    border-top: 1px solid var(--color-border);
+  }
+  .rule-double {
+    border: 0;
+    border-top: 3px double var(--color-border);
+  }
+
+  /* Serif small-caps label — masthead date line, section eyebrows, nav. */
+  .almanac-smallcaps {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: "opsz" 20;
+    font-weight: 500;
+    font-style: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    color: var(--color-muted-foreground);
+  }
+
+  /* Drop cap — first paragraph of long-form writing, opt-in via .has-dropcap. */
+  .has-dropcap > p:first-of-type::first-letter {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: "opsz" 144;
+    font-weight: 560;
+    float: left;
+    line-height: 0.72;
+    font-size: 3.4em;
+    padding-right: 0.08em;
+    margin-top: 0.02em;
+    color: var(--color-primary);
   }
 }
