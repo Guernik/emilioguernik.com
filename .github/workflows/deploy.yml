@@ -26,8 +26,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Build Astro site
         uses: withastro/action@v3
-        # Defaults are fine: it installs deps, runs `astro build`,
-        # and uploads ./dist as the Pages artifact. Node is read from .nvmrc.
+        with:
+          # Astro requires Node >=22.12.0; the action defaults to Node 20,
+          # so pin it explicitly (it installs the latest matching 22.x).
+          node-version: 22
+        # Installs deps, runs `astro build`, uploads ./dist as the Pages artifact.
 
   deploy:
     needs: build
