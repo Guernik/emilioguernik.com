@@ -1,0 +1,44 @@
+/* Hallmark · theme: Almanac (editorial) · portable token export
+ * Applied in-place over this project's existing Flexoki + shadcn token layer.
+ * The live source of truth is src/styles/global.css; this file mirrors the
+ * Almanac-relevant tokens so the system is portable to another project.
+ *
+ * paper band: light (#FFFCF0) · display style: roman-serif · accent hue: warm
+ */
+:root {
+  /* Typography ------------------------------------------------------------ */
+  --font-display: "Fraunces Variable", ui-serif, Georgia, "Times New Roman", serif;
+  --font-sans: "Geist Variable", sans-serif;
+  --font-mono: "Geist Mono Variable", monospace;
+  --font-heading: var(--font-display);
+
+  /* Editorial type scale (rem) */
+  --text-display: 3rem;   /* page mastheads / post h1 */
+  --text-2xl: 1.5rem;
+  --text-xl: 1.25rem;
+  --text-lg: 1.125rem;
+  --text-base: 1rem;
+  --text-sm: 0.875rem;
+  --text-smallcaps: 0.72rem;
+
+  /* Warm-neutral paper + ink (Flexoki base) ------------------------------- */
+  --color-paper: oklch(0.9901 0.016 95.3);      /* #FFFCF0 */
+  --color-ink: oklch(0.2734 0.0023 67.6);       /* base-900 */
+  --color-ink-muted: oklch(0.5375 0.0077 97.5); /* base-600 */
+  --color-rule: oklch(0.8463 0.0136 102.2);     /* base-200, hairline */
+
+  /* Single warm accent — used at < 5% of any viewport --------------------- */
+  --color-accent: oklch(0.5043 0.1648 27.8);    /* Flexoki red-600 */
+  --color-accent-soft: oklch(0.5971 0.1691 28.4); /* red-400 (dark mode) */
+
+  /* Rhythm ---------------------------------------------------------------- */
+  --rule-hair: 1px solid var(--color-rule);
+  --rule-double: 3px double var(--color-rule);
+  --radius: 0.5rem;
+  --tracking-display: -0.011em;
+  --tracking-smallcaps: 0.14em;
+
+  /* Motion ---------------------------------------------------------------- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 200ms;
+}

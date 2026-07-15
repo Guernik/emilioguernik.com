@@ -4,21 +4,23 @@ import { config } from "@parseConfig"
 const year = new Date().getFullYear()
 ---
 
-<footer
-  class="mt-16 inline-flex items-baseline justify-between gap-x-4 pt-8 text-xs text-muted-foreground sm:text-sm"
->
-  <p>
-    &copy; {year}
-    <span class="font-medium text-foreground/80">{config.site.author}</span>
-  </p>
+<footer class="mt-16 pt-8">
+  <hr class="rule-double mb-4" />
+  <div
+    class="flex items-baseline justify-between gap-x-4 text-xs text-muted-foreground sm:text-sm"
+  >
+    <p>
+      &copy; {year}
+      <span
+        class="font-display font-medium text-foreground/80"
+        style="font-optical-sizing: auto; font-variation-settings: 'opsz' 24;"
+        >{config.site.author}</span
+      >
+    </p>
 
-  <p>
-    Built with <a
-      href="https://github.com/odhyp/astro-sidey"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="font-medium text-foreground/80 underline underline-offset-2 transition-colors duration-200 ease-out hover:text-foreground"
-      >Astro Sidey</a
-    >
-  </p>
+    <p>
+      Set in <span class="text-foreground/70">Fraunces</span> &amp;
+      <span class="text-foreground/70">Geist</span>
+    </p>
+  </div>
 </footer>

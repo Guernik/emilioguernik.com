@@ -14,7 +14,19 @@ const writingEntries = await getWritings()
 
 <BaseLayout title={title} description={description}>
   <Prose>
-    <h1>Writings</h1>
+    <header class="not-prose mb-10">
+      <h1 class="font-display text-3xl font-medium tracking-tight text-foreground">
+        Writings
+      </h1>
+      <p class="mt-1 text-muted-foreground">{description}</p>
+      <div class="mt-4 flex items-baseline justify-between">
+        <span class="almanac-smallcaps">
+          {writingEntries.length} {writingEntries.length === 1 ? "Entry" : "Entries"}
+        </span>
+        <hr class="rule-hair ml-4 grow" />
+      </div>
+    </header>
+
     <div class="not-prose flex flex-col gap-y-8">
       {
         writingEntries.map((writingEntry) => (

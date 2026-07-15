@@ -9,22 +9,31 @@ const isActive = (href: string) =>
 ---
 
 <aside class="">
-  <nav
-    class="flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-border/50 py-4 md:mt-16 md:h-fit md:flex-col md:items-end md:border-r md:border-b-0 md:py-0 md:pr-8"
-  >
-    {
-      navMenu.map((nav) => (
-        <a
-          href={nav.href}
-          class:list={[
-            "py-0.5 text-muted-foreground transition-colors duration-200 ease-out hover:text-foreground",
-            isActive(nav.href) &&
-              "font-medium text-foreground! underline decoration-muted-foreground/50 underline-offset-2 hover:decoration-muted-foreground",
-          ]}
-        >
-          {nav.label}
-        </a>
-      ))
-    }
-  </nav>
+  <div class="flex flex-col gap-y-4 py-4 md:mt-16 md:items-end md:border-r md:border-border/50 md:py-0 md:pr-8">
+    <a
+      href="/"
+      class="font-display text-lg font-medium tracking-tight text-foreground transition-opacity duration-200 ease-out hover:opacity-70 md:text-right"
+      style="font-optical-sizing: auto; font-variation-settings: 'opsz' 40;"
+    >
+      {config.site.author}
+    </a>
+
+    <nav
+      class="flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-border/50 pb-4 md:h-fit md:flex-col md:items-end md:border-b-0 md:pb-0"
+    >
+      {
+        navMenu.map((nav) => (
+          <a
+            href={nav.href}
+            class:list={[
+              "almanac-smallcaps py-0.5 transition-colors duration-200 ease-out hover:text-foreground",
+              isActive(nav.href) && "font-semibold text-foreground!",
+            ]}
+          >
+            {nav.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
 </aside>
