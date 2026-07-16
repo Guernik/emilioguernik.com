@@ -29,6 +29,12 @@ const { class: className } = Astro.props
     "prose-ol:text-foreground prose-ul:text-foreground",
     "prose-li:marker:text-foreground/80",
     "prose-blockquote:border-l-border/50 prose-blockquote:text-muted-foreground prose-blockquote:italic",
+    // Force the quote body onto --muted-foreground so it matches the cite (plugin sets its own quote color otherwise)
+    "[&_blockquote]:[--tw-prose-quotes:var(--muted-foreground)] [&_blockquote_p]:text-muted-foreground",
+    // Drop the plugin's decorative curly quotes on blockquotes (left rule + italic carry it)
+    "[&_blockquote_p:first-of-type::before]:content-none [&_blockquote_p:last-of-type::after]:content-none",
+    // Blockquote attribution: upright (not italic) + smaller + muted, stays inside the quote
+    "[&_cite]:block [&_cite]:not-italic [&_cite]:text-sm [&_cite]:text-muted-foreground [&_cite]:mt-2",
     "prose-strong:text-foreground",
     "prose-hr:my-8 prose-hr:border-0 prose-hr:border-t prose-hr:border-t-border/50",
 
