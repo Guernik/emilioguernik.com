@@ -1,0 +1,44 @@
+---
+import { Icon } from "astro-icon/components"
+
+interface Props {
+  text: string
+  author: string
+  link?: string
+}
+
+const { text, author, link } = Astro.props
+
+// Split on newline characters so long quotes can break onto multiple lines.
+// Both a literal newline in the attribute and an escaped "\n" are supported.
+const lines = text.replace(/\\n/g, "\n").split("\n")
+---
+
+<blockquote>
+  <p>
+    {
+      lines.map((line, i) => (
+        <>
+          {i > 0 && <br />}
+          {line}
+        </>
+      ))
+    }
+  </p>
+  <cite>
+    ― {author}
+    {
+      link && (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer external"
+          aria-label={`Open source for "${author}" in a new tab`}
+          class="ml-1 inline-flex translate-y-px text-muted-foreground/60 transition-colors duration-200 ease-out hover:text-foreground"
+        >
+          <Icon name="ph:arrow-square-out" size={13} />
+        </a>
+      )
+    }
+  </cite>
+</blockquote>
