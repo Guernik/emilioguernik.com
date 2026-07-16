@@ -20,6 +20,11 @@ const fullTitle = isHome
 const description = pageDescription || config.site.description
 const socialImage = new URL(image || "/og-image.png", config.site.url)
 const canonicalURL = new URL(Astro.url.pathname, config.site.url)
+
+// Keep the canonical production domain indexable; any other host this is
+// built for (the hackwhite.com Cloudflare mirror) is a performance testbed
+// and should stay out of search results to avoid duplicate content.
+const isCanonicalHost = config.site.url === "https://emilioguernik.com"
 ---
 
 {/* Global Metadata */}
@@ -72,7 +77,10 @@ const canonicalURL = new URL(Astro.url.pathname, config.site.url)
 <link rel="manifest" href="/favicons/site.webmanifest" />
 
 {/* Optional */}
-<meta name="robots" content="index, follow" />
+<meta
+  name="robots"
+  content={isCanonicalHost ? "index, follow" : "noindex, nofollow"}
+/>
 
 {/* View Transition API */}
 <ClientRouter />

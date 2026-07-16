@@ -14,8 +14,11 @@ export const sideyConfig = {
     // A short fallback summary of your site used for SEO and social share cards
     description: "The personal site and blog of Emilio Guernik.",
 
-    // The production domain where your site is deployed (no trailing slash)
-    url: "https://emilioguernik.com",
+    // The production domain where your site is deployed (no trailing slash).
+    // Overridable at build time via SITE_URL so the same source can be built
+    // for multiple hosts (e.g. the Cloudflare Pages mirror on hackwhite.com).
+    // This value bakes into canonical tags, OG URLs, the sitemap, and RSS.
+    url: process.env.SITE_URL ?? "https://emilioguernik.com",
 
     // Your name, utilized in copyright strings and author meta tags
     author: "Emilio Guernik",
