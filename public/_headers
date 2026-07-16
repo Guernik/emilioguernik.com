@@ -1,0 +1,20 @@
+# Cloudflare Pages reads this file to set response headers.
+# https://developers.cloudflare.com/pages/configuration/headers/
+#
+# Everything under /_astro/ is content-hashed by Astro (e.g.
+# Prose.BXbWaou9.css), so the URL changes whenever the bytes change.
+# That makes it safe to cache immutably: the browser never has to
+# revalidate, and a new deploy is picked up via the new filename.
+# Bundled fonts (.woff2) also land in /_astro/, so this one rule covers
+# CSS, JS, and fonts alike.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML: Cloudflare Pages defaults HTML to `max-age=0, must-revalidate`,
+# which makes Astro's viewport prefetch pay a full round-trip on every
+# click (the prefetched page is stale on arrival). A short max-age lets a
+# prefetched page be reused instantly on navigation, matching the GitHub
+# Pages behaviour, while staying short enough that a deploy isn't served
+# stale for long. `stale-while-revalidate` refreshes it in the background.
+/*
+  Cache-Control: public, max-age=600, stale-while-revalidate=86400
