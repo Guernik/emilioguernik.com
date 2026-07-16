@@ -2,6 +2,14 @@
 import { ClientRouter } from "astro:transitions"
 import { config } from "@parseConfig"
 
+// Preload the two above-the-fold display fonts. Importing the woff2 with
+// `?url` lets Astro emit the content-hashed path and hand back the resolved
+// URL, so these preloads never go stale when the font package updates.
+// Without them the browser only discovers the fonts after Prose.css parses,
+// which pushes them onto the LCP critical path (see PageSpeed dependency tree).
+import frauncesUrl from "@fontsource-variable/fraunces/files/fraunces-latin-opsz-normal.woff2?url"
+import geistUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url"
+
 interface Props {
   title: string
   description: string
@@ -30,6 +38,18 @@ const isCanonicalHost = config.site.url === "https://emilioguernik.com"
 {/* Global Metadata */}
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+{/* Preload above-the-fold fonts so they're not blocked on CSS parse.
+    crossorigin is required for fonts even when same-origin. */}
+<link
+  rel="preload"
+  href={frauncesUrl}
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>
+<link rel="preload" href={geistUrl} as="font" type="font/woff2" crossorigin />
+
 <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
 <meta name="generator" content={Astro.generator} />
 <meta name="author" content={config.site.author} />
@@ -92,7 +112,7 @@ const isCanonicalHost = config.site.url === "https://emilioguernik.com"
 <style is:global>
   ::view-transition-old(root),
   ::view-transition-new(root) {
-    animation-duration: 0.12s;
+    animation-duration: 0.08s;
     animation-timing-function: ease-out;
   }
 </style>

@@ -61,7 +61,12 @@ export default defineConfig({
     }),
   },
   prefetch: {
-    defaultStrategy: "viewport",
+    // `hover` prefetches the instant the pointer touches a link (~150-300ms
+    // before the click lands on desktop), which warms the target HTML in time
+    // so the first click isn't a cold fetch. `viewport` only prefetched links
+    // already scrolled into view, so a quick or off-screen click hit the
+    // network cold — the main cause of the laggy first navigation.
+    defaultStrategy: "hover",
     prefetchAll: true,
   },
   site: sideyConfig.site.url,
