@@ -60,13 +60,13 @@ jobs:
         run: npm ci
       - name: Build Astro site
         # SITE_URL overrides the canonical domain baked into canonical tags,
-        # OG URLs, the sitemap, and RSS so this mirror advertises hackwhite.com.
+        # OG URLs, the sitemap, and RSS so this mirror advertises its own host.
         run: npm run build
         env:
-          SITE_URL: https://hackwhite.com
+          SITE_URL: ${{ secrets.CLOUDFLARE_SITE_URL }}
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy ./dist --project-name=hackwhite-com --branch=main
+          command: pages deploy ./dist --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }} --branch=main
