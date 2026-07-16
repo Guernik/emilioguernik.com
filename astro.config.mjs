@@ -26,6 +26,13 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
+  // Serve pages as `/values` directly (values.html) rather than
+  // `/values/` (values/index.html). Avoids the static-host 301 redirect
+  // from the bare path, which was defeating link prefetch.
+  trailingSlash: "ignore",
+  build: {
+    format: "file",
+  },
   integrations: [astroExpressiveCode(), mdx(), icon(), sitemap()],
   markdown: {
     processor: unified({
