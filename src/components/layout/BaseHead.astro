@@ -76,3 +76,15 @@ const canonicalURL = new URL(Astro.url.pathname, config.site.url)
 
 {/* View Transition API */}
 <ClientRouter />
+
+{/*
+  Speed up the browser's default root cross-fade. The UA default is ~0.25s;
+  shortening it makes navigation feel snappier without removing the fade.
+*/}
+<style is:global>
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.12s;
+    animation-timing-function: ease-out;
+  }
+</style>
