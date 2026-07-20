@@ -37,7 +37,7 @@ export const sideyConfig = {
     { label: "Home", href: "/" },
     { label: "Values", href: "/values" },
     { label: "Writings", href: "/writings" },
-    { label: "Colophon", href: "/about-this-site" },
+    { label: "Colophon(wip)", href: "/about-this-site" },
     { label: "About", href: "/about" },
     { label: "RSS", href: "/rss.xml" },
   ],
