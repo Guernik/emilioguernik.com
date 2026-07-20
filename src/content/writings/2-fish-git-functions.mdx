@@ -1,0 +1,33 @@
+---
+title: "AI git functions for fish shell"
+description: "A set of small wrappers for git commands that I use daily."
+date: 2026-07-19
+tags: ["svg", "penplot"]
+draft: false
+---
+Some times, when I'm doing edits directly, that is, without some agent (yes, I still write code myself!), I do want a LLM-generated, [conventional-commit](https://www.conventionalcommits.org/en/v1.0.0/) message.  
+That's usually a single message to claude "give me a conventional commit message for this diff", which later I converted to a skill. This allows me to tune some nuances arround when to use `chore` vs `build`, etc,.  
+However, even the use of the skill became a bit tedious, so I wrote a small set of git functions for fish shell that I use daily.
+
+### `ac` (for AutoCommit)
+```console
+emilio@Emilios-MacBook-Pro ~/p/fish_functions (docs/mermaid-diagrams)> ac
+Generating commit message…
+
+docs: reorganize README sections and add mermaid flow diagrams
+
+Restructured the README to improve clarity and readability by moving the
+Requirements section before Functions and relocating the `ac` and `ghpr` flow
+diagrams into a dedicated Functions subsection.
+
+Changes:
+- Add Requirements section with dependencies: fish ≥ 3.6, claude, gh, and git
+- Move Requirements section before the Functions section
+- Create `ac` flow and `ghpr` flow subsections with mermaid diagrams
+- Relocate flow diagrams from "How `ac` and `ghpr` work" section into function
+subsections
+- Remove "How `ac` and `ghpr` work" heading (content now integrated into
+function flow subsections)
+
+Commit? [Y/n/e(dit)]
+```
