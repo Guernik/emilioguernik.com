@@ -6,11 +6,13 @@ tags: ["svg", "penplot"]
 draft: false
 ---
 Some times, when I'm doing edits directly, that is, without some agent (yes, I still write code myself!), I do want a LLM-generated, [conventional-commit](https://www.conventionalcommits.org/en/v1.0.0/) message.  
+
 That's usually a single message to claude "give me a conventional commit message for this diff", which later I converted to a skill. This allows me to tune some nuances arround when to use `chore` vs `build`, etc,.  
-However, even the use of the skill became a bit tedious, so I wrote a small set of git functions for fish shell that I use daily.
+
+However, even the use of the skill became a bit tedious, so I wrote a small set of `git` functions for fish shell that I use daily.
 
 ### `ac` (for AutoCommit)
-```console
+```bash
 emilio@Emilios-MacBook-Pro ~/p/fish_functions (docs/mermaid-diagrams)> ac
 Generating commit message…
 
@@ -31,3 +33,6 @@ function flow subsections)
 
 Commit? [Y/n/e(dit)]
 ```
+
+
+wip!
