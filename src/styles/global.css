@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@fontsource-variable/fraunces/opsz.css";
+@import "@fontsource-variable/newsreader/opsz.css";
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
 
@@ -247,8 +247,8 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Almanac: Fraunces display serif for headings; Geist stays for body + UI */
-  --font-display: "Fraunces Variable", ui-serif, Georgia, "Times New Roman", serif;
+  /* Almanac: Newsreader display serif for headings; Geist stays for body + UI */
+  --font-display: "Newsreader Variable", ui-serif, Georgia, "Times New Roman", serif;
   --font-heading: var(--font-display);
   --font-sans: "Geist Variable", sans-serif;
   --font-mono: "Geist Mono Variable", monospace;
@@ -310,7 +310,7 @@
 
 /* Hallmark · genre: editorial · macrostructure: Long Document · theme: Almanac
  * tone: editorial · anchor hue: warm (Flexoki red-600, oklch 0.50 0.16 27.8)
- * display: Fraunces Variable (roman, optical) · body/ui: Geist Variable
+ * display: Newsreader Variable (roman, optical) · body/ui: Geist Variable
  * nav: N9 edge-aligned side-rail · footer: Ft4 dense colophon
  * paper band: light (#FFFCF0) · display style: roman-serif · accent hue: warm
  * redesign: in-place type + accent + rhythm layer over existing Flexoki tokens
@@ -328,7 +328,7 @@
   }
 
   /* Almanac headings are roman and lightly-set — weight, not heft.
-     Fraunces at 460–560 reads editorial without shouting. */
+     Newsreader at 460–560 reads editorial without shouting. */
   h1.font-display,
   .prose h1 {
     font-weight: 540;

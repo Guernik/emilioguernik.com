@@ -7,7 +7,7 @@
  */
 :root {
   /* Typography ------------------------------------------------------------ */
-  --font-display: "Fraunces Variable", ui-serif, Georgia, "Times New Roman", serif;
+  --font-display: "Newsreader Variable", ui-serif, Georgia, "Times New Roman", serif;
   --font-sans: "Geist Variable", sans-serif;
   --font-mono: "Geist Mono Variable", monospace;
   --font-heading: var(--font-display);
