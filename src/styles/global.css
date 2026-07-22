@@ -385,3 +385,24 @@
     color: var(--color-primary);
   }
 }
+
+/* Mermaid container override — kept OUTSIDE any @layer on purpose.
+   astro-mermaid injects its own unlayered <style> into <head> at RUNTIME (after
+   this bundled CSS loads), tinting pre.mermaid[data-processed] with a faint rgba
+   fill + border-radius. It sets that fill on three code paths:
+     · @media (prefers-color-scheme: light|dark)   pre.mermaid[data-processed]  (0-1-1)
+     · [data-theme="light"|"dark"]                  pre.mermaid[data-processed]  (0-2-1)
+   At equal specificity the later-injected rule wins on source order, so we don't
+   rely on order — we out-specify each path. This site themes via a .dark class
+   today, but may adopt [data-theme] later, so both paths are covered:
+     · `html pre.mermaid[data-processed]` = 0-1-2, beats the @media path
+     · `[data-theme] pre.mermaid[data-processed]` = 0-2-1, ties the data-theme
+        path but wins on source order (bundled data-theme rule is a valid future
+        target; when it applies, ours is the one authored here to win).
+   Goal: transparent background, small dashed grey frame around each diagram. */
+html pre.mermaid[data-processed],
+[data-theme] pre.mermaid[data-processed] {
+  background-color: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+}
