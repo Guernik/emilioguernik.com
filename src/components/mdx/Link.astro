@@ -1,0 +1,20 @@
+---
+import { Icon } from "astro-icon/components"
+
+interface Props {
+  href: string
+  label?: string
+}
+
+const { href, label } = Astro.props
+---
+
+<a
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer external"
+  aria-label={label ?? "Open link in a new tab"}
+  class="ml-1 inline-flex translate-y-px text-muted-foreground/60 transition-colors duration-200 ease-out hover:text-foreground"
+>
+  <Icon name="ph:arrow-square-out" size={13} />
+</a>

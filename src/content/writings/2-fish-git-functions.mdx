@@ -2,20 +2,113 @@
 title: "AI git functions for fish shell"
 description: "A set of small wrappers for git commands that I use daily."
 date: 2026-07-19
-tags: ["svg", "penplot"]
+tags: ["fish", "git", "claude", "shell"]
 draft: false
 ---
 
-Some times, when I'm doing edits directly, that is, without some agent (yes, I still write code myself!), I do want a LLM-generated, [conventional-commit](https://www.conventionalcommits.org/en/v1.0.0/) message.
+import Link from "@components/mdx/Link.astro"
 
-That's usually a single message to claude "give me a conventional commit message for this diff", which later I converted to a skill. This allows me to tune some nuances arround when to use `chore` vs `build`, etc,.
+Sometimes, when I'm doing edits directly, (i.e: without some agent, _—yes, I do write code myself sometimes—_ ), I still want a LLM-generated, [conventional-commit](https://www.conventionalcommits.org/en/v1.0.0/) message.
 
-However, even the use of the skill became a bit tedious, so I wrote a small set of `git` functions for fish shell that I use daily.
+That's usually a single message to Claude "give me a conventional commit message for this diff", which I have later converted to a skill. This allows me to tune some nuances around when to use `chore` vs `build`, etc.,
+
+However, even the use of the skill became a bit tedious, so I wrote a small set of `git` functions for the fish shell that I use daily.
+
+These are `ac`, `ghpr` and `gitm`.
+
+I have them released as a `fisher`<Link href="https://github.com/jorgebucaran/fisher" /> plugin, check out the [repo](https://github.com/Guernik/fish-ai-git)!
+
+Once you have fisher installed, adding the functions is as easy as doing
+
+```bash
+fisher install Guernik/fish-ai-git@v1.0.0
+```
+
+Make sure to use the v1.0.0 since that's the signed [release](https://github.com/Guernik/fish-ai-git/releases).
+
+## Project setup and repo hygiene
+
+I like setting up my projects with good industry standard practices.  
+In this case we have:
+
+### 1. pre-commit hooks <Link href="https://github.com/Guernik/fish-ai-git/blob/main/.pre-commit-config.yaml" />
+
+- `end-of-file-fixer`
+- `trailing-whitespace`
+- `check-merge-conflict`
+- And the local checks: `fish-lint`, `fish-audit`, and `fish-test`
+
+### 2. Unit tests
+
+Thanks to [fishtape](https://github.com/jorgebucaran/fishtape), (available as a fisher plugin), we have some decent coverage:
+
+```bash
+emilio@Emilios-MacBook-Pro ~/p/fish_functions (main)> just test
+TAP version 13
+ok 1 ac bails when there is nothing to commit
+ok 2 ac reports nothing to commit
+ok 3 ac commits with the model's message subject
+ok 4 ac sends the real source change to the model
+ok 5 ac excludes lockfile content from the model prompt
+...
+ok 46 gitm -h prints usage
+
+1..46
+# pass 46
+# ok
+```
+
+### 3. CI/CD
+
+`lint-and-test` and `audit` checks are provided on the ci.yml [workflow file](https://github.com/Guernik/fish-ai-git/blob/main/.github/workflows/ci.yml)
+![alt text](../../../public/images/2-fish-git-functions/image-4.png)
+
+The release is handled by the [release.yml](https://github.com/Guernik/fish-ai-git/blob/main/.github/workflows/release.yml) workflow, activated upon a newly pushed tag.  
+The job will check that the tag was signed and generates a new GitHub release (look at the v1.0.0 release for an [example](https://github.com/Guernik/fish-ai-git/actions/runs/29933504901) job run)
+
+### 4. Security
+
+Since this project install code that runs on your machine, checking out git branches, and calling and external LLM, some security considerations have been made.
+You can read more about that on the repos [SECURITY page](https://github.com/Guernik/fish-ai-git/blob/main/SECURITY.md)
+Basically all tags and releases are signed by my personal singing key (which you can [verify](https://github.com/Guernik/fish-ai-git/blob/main/SECURITY.md) locally). Releases are blocked if the tag is not sign.
+
+Dependabot and code attestation have also been considered, but discarded at the moment (no dependencies to update, and no artifacts to sign).
+
+## Functions logic
 
 ### `ac` (for AutoCommit)
 
+#### How it works
+
+```mermaid
+flowchart LR
+    A[git add -A] --> B[Build diff<br/>exclude noisy files] --> C([<strong>claude -p<br/>generate message</strong>]) --> D[Show + prompt] --> E[git commit]
+    classDef ai fill:#4AAE47,stroke:#2f7a2d,color:#fff;
+    class C ai;
+```
+
+#### Example
+
+Help text:
+
 ```bash
-emilio@Emilios-MacBook-Pro ~/p/fish_functions (docs/mermaid-diagrams)> ac
+emilio@emilio ~/ (main)> ac  --help
+usage: ac [-h|--help]
+
+Stage all changes (git add -A) and commit with an AI-generated
+Conventional Commit message. Shows the message and prompts before
+committing: [Y] commit, [e] edit in $EDITOR, [n] abort (changes
+stay staged).
+
+The model defaults to $AC_MODEL (haiku). Noisy/generated files
+(lockfiles, minified assets, dist/, build/, snapshots) are hidden
+from the diff sent to the model, but every staged file is committed.
+```
+
+Usage example:
+
+```bash
+emilio@emilio ~/p/fish_functions (docs/mermaid-diagrams)> ac
 Generating commit message…
 
 docs: reorganize README sections and add mermaid flow diagrams
@@ -36,4 +129,66 @@ function flow subsections)
 Commit? [Y/n/e(dit)]
 ```
 
-wip!
+It's not perfect though! For instance, look at this [commit](https://github.com/Guernik/fish-ai-git/commit/f22c2b030d3e857d514960606528d7eb4a67751a)
+![alt text](../../../public/images/2-fish-git-functions/image.png)
+Some LLM related context got to the commit message. (Commit title should have been `ci: harden supply chain with signed releases...`)
+In my defense, I did set up the `e(dit)` positivity to always have the last word, but this one slipped away!
+(It does look ugly, but I will not rewrite the history of the repo for a small commit message mistake).
+
+The rest of the commits are good though
+![alt text](../../../public/images/2-fish-git-functions/image-1.png)
+
+### `ghpr` (for GitHub Pull Request)
+
+`ghpr` pushes the current branch and opens a GitHub PR with an AI-generated title and body. It detects the base branch automatically, so most of the time it's a single command.
+
+#### How it works
+
+```mermaid
+flowchart LR
+    A[ghpr] --> B[git push] --> C([<strong>claude -p<br/>PR title + body</strong>]) --> D[gh pr create]
+    classDef ai fill:#4AAE47,stroke:#2f7a2d,color:#fff;
+    class C ai;
+```
+
+#### Example
+
+```bash
+emilio@Emilios-MacBook-Pro ~/p/fish_functions (docs/mermaid-diagrams)> ghpr
+# → pushes the branch and opens a PR with an AI title + body
+Push 'docs/mermaid-diagrams' and open PR against 'main'? [Y/n/w(eb)]
+```
+
+Same idea as `ac`: accept (`Y`), reject (`n`), or hit `w` to open the browser with the PR pre-filled instead of creating it directly.
+
+### `gitm` (for Git Merge cleanup)
+
+`gitm` is the tidy-up step after a PR gets merged. It switches to the repo's default branch, pulls, and deletes the branch you just left — but only if it's already merged, so unmerged work is never dropped.
+
+#### How it works
+
+```mermaid
+flowchart LR
+    A[gitm] --> B[git switch default] --> C[git pull] --> D{branch merged?} -->|yes| E[git branch -d] --> F[done]
+    D -->|no| F
+```
+
+#### Example
+
+```bash
+emilio@Emilios-MacBook-Pro ~/p/fish_functions (docs/mermaid-diagrams)> gitm
+# → back on main, pulled, and the merged feature branch cleaned up
+```
+
+Together, `ac`, `ghpr` and `gitm` cover the whole loop — commit, open the PR, and clean up once it's merged — without ever leaving the terminal or hand-writing a message.
+
+## Configuration
+
+By default, `ac` and `ghpr` use the `AC_MODEL` and `GHPR_MODEL` universal variables, set to `haiku` on install.
+Since I'm mostly using Claude as my primary coding agent/LLM, I didn't set up any means to configure other providers.
+
+## Further improvements
+
+`fish-ai`<Link href="https://github.com/Realiserad/fish-ai" /> is another fish plugin that aims to incorporate AI into the shell in a more deep, involved manner.
+Even when such a setup is a bit too much for me (it actually uses a python backend each time you call the plugin), the configuration mechanism they provide is [interesting](https://github.com/Realiserad/fish-ai#create-a-configuration), particularly the OpenRouter and local LLM setup.  
+As a further improvement of my functions, I could provide some similar configuration options, or better yet, feel free to open a PR!
