@@ -17,6 +17,7 @@ import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs"
 import rehypeLightbox from "./src/plugins/rehype-lightbox.mjs"
 import rehypeSlug from "rehype-slug"
 import rehypeAutolinkHeadings from "rehype-autolink-headings"
+import mermaid from 'astro-mermaid';
 
 // Sidey Config
 import { sideyConfig } from "./sidey.config.ts"
@@ -33,7 +34,16 @@ export default defineConfig({
   build: {
     format: "file",
   },
-  integrations: [astroExpressiveCode(), mdx(), icon(), sitemap()],
+  integrations: [astroExpressiveCode(), mdx(), icon(), sitemap(), mermaid({
+      theme: 'forest',
+      autoTheme: false,
+      mermaidConfig: {
+        startOnLoad: false,
+        logLevel: 'error',
+        securityLevel: 'strict'
+      }
+    })
+],
   markdown: {
     processor: unified({
       remarkPlugins: [remarkReadingTime],
