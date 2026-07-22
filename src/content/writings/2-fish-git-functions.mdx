@@ -6,13 +6,38 @@ tags: ["svg", "penplot"]
 draft: false
 ---
 
-Some times, when I'm doing edits directly, that is, without some agent (yes, I still write code myself!), I do want a LLM-generated, [conventional-commit](https://www.conventionalcommits.org/en/v1.0.0/) message.
+import Link from "@components/mdx/Link.astro"
 
-That's usually a single message to claude "give me a conventional commit message for this diff", which later I converted to a skill. This allows me to tune some nuances arround when to use `chore` vs `build`, etc,.
+Some times, when I'm doing edits directly, (i.e: without some agent, _—yes, I do write code myself sometimes—_ ), I still want a LLM-generated, [conventional-commit](https://www.conventionalcommits.org/en/v1.0.0/) message.
 
-However, even the use of the skill became a bit tedious, so I wrote a small set of `git` functions for fish shell that I use daily.
+That's usually a single message to claude "give me a conventional commit message for this diff", which I have later converted to a skill. This allows me to tune some nuances arround when to use `chore` vs `build`, etc,.
+
+However, even the use of the skill became a bit tedious, so I wrote a small set of `git` functions for the fish shell that I use daily.
+
+These are `ac`, `ghpr` and `gitm`.
+
+I have them released as a `fisher`<Link href="https://github.com/jorgebucaran/fisher" /> plugin, check out the [repo](https://github.com/Guernik/fish-ai-git)!
+
+Once you have fisher installed, adding the functions is as easy as doing
+
+```bash
+fisher install Guernik/fish-ai-git@v1.0.0
+```
+
+Make sure to use the v1.0.0 since that's the signed [release](https://github.com/Guernik/fish-ai-git/releases).
 
 ### `ac` (for AutoCommit)
+
+#### How it works
+
+```mermaid
+flowchart LR
+    A[git add -A] --> B[Build diff<br/>exclude noisy files] --> C([<strong>claude -p<br/>generate message</strong>]) --> D[Show + prompt] --> E[git commit]
+    classDef ai fill:#4AAE47,stroke:#2f7a2d,color:#fff;
+    class C ai;
+```
+
+#### Example
 
 ```bash
 emilio@Emilios-MacBook-Pro ~/p/fish_functions (docs/mermaid-diagrams)> ac
@@ -35,5 +60,3 @@ function flow subsections)
 
 Commit? [Y/n/e(dit)]
 ```
-
-wip!
