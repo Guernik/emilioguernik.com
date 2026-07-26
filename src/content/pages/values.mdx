@@ -5,32 +5,56 @@ description: "My personal values and principles that guide my work and life."
 
 import AuthoredQuote from "@components/mdx/AuthoredQuote.astro"
 
-Most companies nowadays have a set of values that they claim to uphold.  
+Most companies nowadays have a set of values that they claim to uphold.
 
-I too have my own set that I have constructed over many years of experiences and learning.  
+I too have my own set that I have constructed over many years of experiences and learning.
 
 I try very hard to live by these values, and they help me guide my decisions, actions, and interactions with others.
 
+<div class="not-prose mt-10">
+  <div class="mb-4 flex items-center gap-x-3">
+    <span class="almanac-mediumcaps">Personal</span>
+    <hr class="rule-hair grow" />
+  </div>
+  <ol class="flex flex-col">
+    {[
+      "My word is my most valuable asset.",
+      "Family comes first.",
+      "Help others when you can.",
+      "No one saves themselves alone.",
+    ].map((value, i) => (
+      <li class="flex items-baseline gap-x-4 border-t border-border/50 py-3 first:border-t-0">
+        <span class="font-display text-lg leading-none text-muted-foreground/70 tabular-nums">
+          {String(i + 1).padStart(2, "0")}
+        </span>
+        <span class="text-lg leading-snug text-foreground">{value}</span>
+      </li>
+    ))}
+  </ol>
+</div>
 
-## Personal Values
-**My Word is my most valuable asset.**
-
-**Family comes first.**
-
-**Help others when you can.**
-
-**No one saves themselves alone**
-
-## Professional Values
-**Customers first.**
-
-**Deliver, measure, iterate.**
-
-**Results speak more than words.**
-
-**80% of value first.**
-
-**The sooner the feedback, the better.**
+<div class="not-prose mt-12">
+  <div class="mb-4 flex items-center gap-x-3">
+    <span class="almanac-mediumcaps">Professional</span>
+    <hr class="rule-hair grow" />
+  </div>
+  <ol class="flex flex-col">
+    {[
+      "Customers first.",
+      "Deliver, measure, iterate.",
+      "Results speak more than words.",
+      "80% of value first.",
+      "The sooner the feedback, the better.",
+    ].map((value, i) => (
+      <li class="flex items-baseline gap-x-4 border-t border-border/50 py-3 first:border-t-0">
+        <span class="font-display text-lg leading-none text-muted-foreground/70 tabular-nums">
+          {String(i + 1).padStart(2, "0")}
+        </span>
+        <span class="text-lg leading-snug text-foreground">{value}</span>
+      </li>
+    ))}
+  </ol>
+</div>
 
 ### Quotes I value
 
@@ -38,8 +62,8 @@ I try very hard to live by these values, and they help me guide my decisions, ac
   text="The past has no power over the present moment"
   author="Eckhart Tolle"
   link="https://www.quotery.com/quotes/past-no-power-present-moment"
-/> 
-  
+/>
+
 <AuthoredQuote
   text="If it is not right, do not do it; if it is not true, do not say it."
   author="Marcus Aurelius, Meditations 12.17"
@@ -62,5 +86,5 @@ Can you find more time to do the things you enjoy doing?"
 <AuthoredQuote
   text="This is the essence of intuitive heuristics: when faced with a difficult question, we often answer an easier one instead, usually without noticing the substitution."
   author="Daniel Kahneman, Thinking, Fast and Slow"
-  link="https://blog.academyofpm.com/p/intuitive-heuristics" 
+  link="https://blog.academyofpm.com/p/intuitive-heuristics"
 />
