@@ -370,6 +370,17 @@
     font-size: 0.72rem;
     color: var(--color-muted-foreground);
   }
+  .almanac-mediumcaps {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: "opsz" 20;
+    font-weight: 500;
+    font-style: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 1rem;
+    color: var(--color-muted-foreground);
+  }
 
   /* Drop cap — first paragraph of long-form writing, opt-in via .has-dropcap. */
   .has-dropcap > p:first-of-type::first-letter {
