@@ -24,6 +24,9 @@ const { class: className } = Astro.props
 
     // Image
     "prose-img:cursor-zoom-in prose-img:rounded-sm prose-img:shadow-lg prose-img:transition-all prose-img:duration-200 prose-img:ease-out prose-img:hover:scale-[1.01]",
+    // Badges (an img wrapped in a link, e.g. shields.io) stay inline with the sentence:
+    // the typography plugin makes every img a block with 2em margins, which breaks them.
+    "[&_a_img]:m-0 [&_a_img]:inline-block [&_a_img]:align-text-bottom [&_a_img]:cursor-pointer [&_a_img]:rounded-none [&_a_img]:shadow-none [&_a_img]:hover:scale-100",
 
     // List, markers, blockquote, strong, horizontal line
     "prose-ol:text-foreground prose-ul:text-foreground",

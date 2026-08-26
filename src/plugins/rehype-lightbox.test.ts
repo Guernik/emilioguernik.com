@@ -18,6 +18,16 @@ describe("rehypeLightbox", () => {
     expect(img.properties["style"]).toBe("cursor: zoom-in")
   })
 
+  it("leaves images wrapped in a link untouched", () => {
+    const img = element("img")
+    const anchor = { ...element("a"), children: [img] }
+    const tree = { type: "root", children: [anchor] }
+    rehypeLightbox()(tree)
+
+    expect(img.properties["data-lightbox"]).toBeUndefined()
+    expect(img.properties["style"]).toBeUndefined()
+  })
+
   it("leaves non-img elements untouched", () => {
     const p = element("p")
     const tree = { type: "root", children: [p] }
