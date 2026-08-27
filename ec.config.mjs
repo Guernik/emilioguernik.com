@@ -12,7 +12,7 @@ export default defineEcConfig({
   plugins: [pluginLineNumbers(), pluginCollapsibleSections()],
   defaultProps: {
     // Disable line numbers by default
-    showLineNumbers: false,
+    showLineNumbers: true,
 
     // Change the default style of ExpressiveCode collapsible section plugin
     collapseStyle: "collapsible-auto",
