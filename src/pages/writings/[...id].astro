@@ -18,12 +18,14 @@ interface Props {
 }
 
 const { writingEntry } = Astro.props
-const { Content, remarkPluginFrontmatter } = await render(writingEntry)
+const { Content, headings, remarkPluginFrontmatter } =
+  await render(writingEntry)
 ---
 
 <WritingPage
   frontmatter={writingEntry}
   readingTime={remarkPluginFrontmatter.minutesRead}
+  headings={headings}
 >
   <Content />
 </WritingPage>
