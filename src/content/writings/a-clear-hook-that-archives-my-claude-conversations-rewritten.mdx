@@ -1,0 +1,178 @@
+---
+title: "A /clear hook that archives my Claude conversations"
+description: "SessionEnd fires when you clear a session. I used it to render the transcript and push it to a private repo, without making /clear wait for the network."
+date: 2026-09-18
+tags: ["claude", "hooks", "git", "bash"]
+draft: false
+---
+
+import Callout from "@components/mdx/Callout.astro"
+import Link from "@components/mdx/Link.astro"
+
+I type `/clear` a lot. Once a session has accumulated enough dead ends, it is the cheapest way I know to make it usable again. I probably do it several times a day.
+
+The problem is that, as far as I am concerned, everything in that session is gone. The transcript is still on disk, technically, as a JSONL file under `~/.claude/projects/<mangled-path>/<uuid>.jsonl`. I am never going to browse that directory though.
+
+Every so often I want to find something from an old session: why I made a decision, a prompt that worked, an error from two days ago. The data was there, but might as well not have been. So I wrote a hook that catches `/clear`, renders the transcript into something readable, and commits it to a private repo.
+
+## Which hook event
+
+There is no `PreClear` event. `SessionEnd` is the one that fires. It also fires when you exit Claude Code normally, and gives you a `reason` field in its payload so you can tell the two cases apart. The settings matcher can use that field directly:
+
+```json
+{
+  "hooks": {
+    "SessionEnd": [
+      {
+        "matcher": "clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/export-on-clear.sh",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The payload comes in on stdin as JSON. I care about `transcript_path`, `session_id`, `cwd`, and `reason`.
+
+The script checks `reason` again anyway:
+
+```bash
+[ "${reason:-}" = "clear" ] || exit 0
+```
+
+The matcher already does this, but I would rather a typo in `settings.json` result in nothing happening than quietly archive every session I exit.
+
+## /export doesn't work here
+
+I first tried calling `/export`, because it already makes the file I want. No luck: slash commands are interactive-only, and a hook does not have a session to run one in.
+
+That leaves parsing the transcript JSONL directly. I wrote a small Python renderer that walks its records and flattens each message into text. Most of the work was deciding what not to include:
+
+- Thinking blocks are skipped. I do not need them when I am trying to re-read a conversation.
+- Sidechains, the subagent transcripts, are skipped too. They hide the main thread.
+- Tool results are clipped at 2000 characters and tool inputs at 1500. Otherwise, one `npm install` or a couple of large file reads take over the whole export.
+
+Claude Code's format is internal and changes between releases, so the parser skips records it does not understand instead of failing:
+
+```python
+try:
+    records.append(json.loads(line))
+except (json.JSONDecodeError, ValueError):
+    continue  # tolerate a torn final line
+```
+
+I prefer a partial export to no export. The result is plain text with a small header, then one block per message:
+
+```
+Claude Code conversation export
+session: dfdb7f3f-...
+cwd:     /Users/emilio/projects/dotfiles
+started: 2026-09-18T13:41:02.884Z
+exported: 2026-09-18 14:03:53 -03
+messages: 47
+```
+
+## Not making /clear wait
+
+This was the bit I got wrong the first time.
+
+`SessionEnd` hooks are cancelled after 1.5 seconds unless they set a `timeout`, hence the 15 seconds in the config. But that only lets the hook take longer. A `git push` on a bad network can sit there for all 15 seconds, with my terminal waiting for it. Since I clear sessions constantly, that gets annoying really quickly.
+
+The foreground part only reads the transcript and writes the file. Committing and pushing happen detached in the background.
+
+```bash
+(
+  cd "$REPO" 2>/dev/null || exit 0
+  exec 9>"$REPO/.export.lock" 2>/dev/null || exit 0
+  flock 9 2>/dev/null || :
+
+  git add -A -- . >>"$LOG" 2>&1 || { log "git add failed"; exit 0; }
+  # ... commit, then push with BatchMode and a connect timeout
+) </dev/null >/dev/null 2>&1 &
+disown 2>/dev/null || :
+```
+
+I often have several sessions open across tmux panes. If I clear two close together, two jobs can race on the same repo, so the `flock` serialises them.
+
+The push uses `BatchMode=yes` and `ConnectTimeout=10`. A missing SSH key fails right away instead of waiting for a passphrase prompt that will never be seen. When the push fails, the commit stays local and the next export takes it along.
+
+<Callout>
+  Everything in this script fails open. Every error path logs a line and exits
+  0. A broken archive that eats my `/clear` would be much worse than no archive
+  at all.
+</Callout>
+
+That is why there are so many `|| :` and `2>/dev/null` calls, and why it writes to `~/.claude/export-on-clear.log` instead of printing anything. A hook does not have anywhere useful to print.
+
+## Naming the files
+
+I name exports after the project they ran in, so they are still distinguishable in one flat directory:
+
+```
+2026-09-18-140353-dotfiles-dfdb7f3f.txt
+```
+
+That is a timestamp, the basename of `cwd`, and the first 8 characters of the session id. The project name goes through `tr -cs '[:alnum:]._-' '-'` first because it becomes part of a filename.
+
+While testing, I found that a session started outside a normal project directory produces some ugly names. `basename "$cwd"` is not very useful in that situation. Nothing breaks, and I have not decided whether it is worth special-casing yet.
+
+## Does it work
+
+Yep. Here is what I get after clearing a session in my dotfiles repo:
+
+```
+2026-09-18 14:03:53 wrote 2026-09-18-140353-dotfiles-dfdb7f3f.txt (51667 bytes)
+2026-09-18 14:03:53 pushed 2026-09-18-140353-dotfiles-dfdb7f3f.txt to origin/main
+```
+
+I also hand-fed the script bad payloads to check the failure paths:
+
+```
+2026-09-18 14:04:24 no usable transcript_path (/nope/gone.jsonl); nothing to export
+2026-09-18 14:04:24 exports repo missing or not a git repo: /nonexistent/repo
+```
+
+Both return 0 and `/clear` goes through as usual.
+
+The repo is private, which is pretty important. These transcripts can include file contents, paths, error output, and occasionally something that should stay on my machine. The target repo comes from `CC_EXPORT_REPO`, defaulting to `~/projects/private_cc_exports`.
+
+<Callout>
+  My global config denies `git push origin main` on the agent's Bash tool. That
+  guard is a `PreToolUse` hook on the tool, so it doesn't apply here, and this
+  script pushes to main on purpose. The exports repo is an append-only archive
+  with one branch.
+</Callout>
+
+## Similar solutions elsewhere
+
+For the archiving half there is ai-session<Link href="https://github.com/gammons/ai-session" />, which stores transcripts as git artifacts linked to commits and PRs, and a research transcript hook<Link href="https://github.com/Denubis/claude-code-research-transcript-hook" /> that archives into the project directory. claudesessions<Link href="https://github.com/MichaelrKraft/claudesessions" /> does auto-archiving with full text search on top. For the rendering half, kiliman/claude-transcript<Link href="https://github.com/kiliman/claude-transcript" /> and ccexport<Link href="https://rubygems.org/gems/ccexport" /> both turn the JSONL into readable files, which is most of what my Python script does.
+
+The search problem I describe below is even more solved. claude-lens<Link href="https://github.com/sanchez314c/claude-lens" /> indexes every session into SQLite and exposes it to Claude over MCP, so the model can search its own history mid-conversation. cccmemory<Link href="https://github.com/xiaolai/cccmemory" /> and ClaudeHistoryMCP<Link href="https://github.com/jhammant/ClaudeHistoryMCP" /> do the same thing with different ranking. session-indexer<Link href="https://github.com/valpere/session-indexer" /> runs embeddings locally through Ollama with a keyword fallback.
+
+Nearly all of them index the JSONL files where they sit. That is the one thing I would still change: my exports survive `rm -rf ~/.claude` and show up on my other machine, and an in-place index does neither.
+
+### Trying one of them
+
+I installed the research transcript hook to see what a more serious version looks like. It is MIT licensed, written by an academic at Macquarie, and built around a reproducibility framework with structured metadata for what you were doing and why. Much more rigorous than my flat directory of text files.
+
+It went badly. Its project detection builds the directory name by replacing `/` with `-` and leaving the rest alone, so it went looking for `emilioguernik.com`. Claude Code flattens the dot too, and the directory on disk is `emilioguernik-com`. So it could not find my transcript at all until I passed the path by hand. Then it recorded the project as `workspaces`, having walked up out of the git worktree into the directory above it.
+
+The part that actually bothered me: it copied 21 markdown files into the archive from projects that had nothing to do with the session. Hetzner and k3s notes from my infrastructure work, a bug writeup from a food logging app. If I had committed that directory without reading it, two unrelated projects would have been in a public repo.
+
+It also could not produce its main output. It shells out to a renderer with the output directory set to the folder the input file is already in, and the renderer copies its input into the output directory, so Python raises `SameFileError` and the run dies. The HTML is written just before the crash, so it is sitting there on disk while the tool reports failure. Every run would hit this.
+
+It does more than mine does and is solving a harder problem, and these are the ordinary bugs that live in the gap between someone's machine and mine. But it did settle why I am keeping my own script: 150 lines of bash that I understand completely, where the failure mode is a line in a log file rather than someone else's data in my repo.
+
+## What's left
+
+The empty-render check skips a commit if I clear before a real exchange. That happens fairly often when I clear twice in a row out of habit, and it is fine.
+
+What I actually want now is search. A directory full of text files plus `grep` goes further than I expected, but I keep wanting to ask, "which session was I in when I got this error?" A filename with the project and date only gets me halfway there. An index file, or a generated `README` with a one-line summary for each export, would probably be enough, and if I get tired of maintaining it I will point claude-lens at the exports directory and be done.
+
+The scripts live in my dotfiles<Link href="https://github.com/Guernik/dotfiles" />.
