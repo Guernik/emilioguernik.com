@@ -3,28 +3,33 @@ import BaseLayout from "@layouts/BaseLayout.astro"
 import Prose from "@components/common/Prose.astro"
 import PostTags from "@components/common/PostTags.astro"
 import Back from "@components/common/Back.astro"
+import TableOfContents from "@components/common/TableOfContents.astro"
 import { formatDate } from "@utils/formatDate"
 
-const { frontmatter, readingTime } = Astro.props
+const { frontmatter, readingTime, headings } = Astro.props
 const { title, description, date, tags } = frontmatter.data
 
 const formattedDate = formatDate(date, "long")
 ---
 
 <BaseLayout title={title} description={description}>
-  <Prose class="has-dropcap">
-    <h1>{title}</h1>
+  <div class="relative">
+    <Prose class="has-dropcap">
+      <h1>{title}</h1>
 
-    <div class="not-prose -mt-4 mb-8 flex items-center gap-x-3">
-      <time datetime={date} class="almanac-smallcaps">{formattedDate}</time>
-      <hr class="rule-hair grow" />
-      <span class="almanac-smallcaps">{readingTime}</span>
-    </div>
+      <div class="not-prose -mt-4 mb-8 flex items-center gap-x-3">
+        <time datetime={date} class="almanac-smallcaps">{formattedDate}</time>
+        <hr class="rule-hair grow" />
+        <span class="almanac-smallcaps">{readingTime}</span>
+      </div>
 
-    <slot />
+      <slot />
 
-    <PostTags tags={tags} />
+      <PostTags tags={tags} />
 
-    <Back label="Back to Writings" href="/writings" class="mt-8" />
-  </Prose>
+      <Back label="Back to Writings" href="/writings" class="mt-8" />
+    </Prose>
+
+    <TableOfContents headings={headings} />
+  </div>
 </BaseLayout>

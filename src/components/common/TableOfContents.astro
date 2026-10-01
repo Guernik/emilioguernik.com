@@ -1,0 +1,93 @@
+---
+import type { MarkdownHeading } from "astro"
+
+interface Props {
+  headings: MarkdownHeading[]
+}
+
+const items = Astro.props.headings.filter((h) => h.depth === 2 || h.depth === 3)
+---
+
+{
+  items.length > 1 && (
+    <aside
+      class="absolute inset-y-0 left-full ml-12 hidden w-52 min-[1440px]:block"
+      aria-label="Table of contents"
+    >
+      <nav class="toc sticky top-16 max-h-[calc(100svh-8rem)] overflow-y-auto">
+        <p class="almanac-smallcaps mb-3">On this page</p>
+        <ol class="border-l border-border/50">
+          {items.map((h) => (
+            <li>
+              <a
+                href={`#${h.slug}`}
+                class:list={[
+                  "toc-link -ml-px block border-l border-transparent py-1 pr-2 text-sm leading-snug text-muted-foreground transition-colors duration-200 ease-out hover:text-foreground",
+                  h.depth === 2 ? "pl-3" : "pl-6 text-xs",
+                ]}
+              >
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </aside>
+  )
+}
+
+<script>
+  let cleanup: (() => void) | undefined
+
+  function init() {
+    cleanup?.()
+    cleanup = undefined
+
+    const links = [
+      ...document.querySelectorAll<HTMLAnchorElement>(".toc .toc-link"),
+    ]
+    if (links.length === 0) return
+
+    const headings = links
+      .map((link) =>
+        document.getElementById(decodeURIComponent(link.hash.slice(1)))
+      )
+      .filter((el): el is HTMLElement => el !== null)
+
+    // Active = last heading whose top has crossed the upper quarter of the viewport.
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const threshold = window.innerHeight * 0.25
+      let active = headings[0]
+      for (const h of headings) {
+        if (h.getBoundingClientRect().top > threshold) break
+        active = h
+      }
+      for (const link of links) {
+        link.classList.toggle("is-active", link.hash === `#${active.id}`)
+      }
+    }
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update)
+    }
+
+    update()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("resize", onScroll, { passive: true })
+    cleanup = () => {
+      window.removeEventListener("scroll", onScroll)
+      window.removeEventListener("resize", onScroll)
+      cancelAnimationFrame(frame)
+    }
+  }
+
+  document.addEventListener("astro:page-load", init)
+</script>
+
+<style>
+  .toc-link:global(.is-active) {
+    color: var(--color-foreground);
+    border-left-color: var(--color-primary);
+  }
+</style>
