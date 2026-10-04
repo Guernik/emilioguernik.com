@@ -1,6 +1,6 @@
 {
-  "name": "Astro Sidey",
-  "short_name": "Sidey",
+  "name": "Emilio Guernik",
+  "short_name": "Emilio Guernik",
   "icons": [
     {
       "src": "/favicons/web-app-manifest-192x192.png",
@@ -15,7 +15,7 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#000000",
-  "background_color": "#000000",
+  "theme_color": "#12253B",
+  "background_color": "#12253B",
   "display": "standalone"
 }
